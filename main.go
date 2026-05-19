@@ -1,10 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
-func decode(arr []byte) error {
-	// fmt.Println(arr)
+type Person1 struct {
+	UserName       string   `json:"user_name"`
+	FavoriteNumber int      `json:"favorite_number"`
+	Interests      []string `json:"interests"`
+}
+
+func decode(arr []byte) Person1 {
 	i := 0
+	person := Person1{}
 	for i < len(arr) {
 		num := arr[i]
 
@@ -17,11 +26,15 @@ func decode(arr []byte) error {
 			length := int(arr[i+1])
 			stringArr := arr[i+2 : i+2+length]
 			str := string(stringArr)
+			if i == 0 {
+				person.UserName = str
+			} else {
+				person.Interests = append(person.Interests, str)
+			}
 			fmt.Println(str)
 			i = i + 2 + length
 			break
 		case 0:
-			// j := i + 1
 			bit := 0
 			num := 0
 			for arr[i+1]>>7 != 0 {
@@ -39,22 +52,22 @@ func decode(arr []byte) error {
 			bit += 7
 			fmt.Println(num)
 			i = i + 2
+			person.FavoriteNumber = num
 
 			break
 
 		default:
-			return fmt.Errorf("invalid value:")
+			//
 
 		}
 
-		// i++
 	}
-	return nil
+
+	return person
 
 }
 
 func main() {
-	fmt.Println("Hello, Go!")
 
 	arr := []byte{
 		0x0a, 0x06, 0x4d, 0x61, 0x72, 0x74, 0x69, 0x6e,
@@ -63,7 +76,19 @@ func main() {
 		0x1a, 0x07, 0x68, 0x61, 0x63, 0x6b, 0x69, 0x6e,
 		0x67,
 	}
+	testPerson := decode(arr)
+	b, err := json.MarshalIndent(testPerson, "", "  ")
+	if err != nil {
+		panic(err)
+	}
 
-	decode(arr)
-	// fmt.Println(arr)
+	fmt.Println(string(b))
+
+	person := Person{
+		Name:  "John Doe",
+		ID:    1234,
+		Email: "john@example.com",
+	}
+	fmt.Println(en(person))
+
 }

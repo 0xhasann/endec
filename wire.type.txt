@@ -1,0 +1,8 @@
+| Wire Type        | Value | Meaning                 | Used For                                                                 |
+| ---------------- | ----- | ----------------------- | ------------------------------------------------------------------------ |
+| Varint           | `0`   | Variable-length integer | `int32`, `int64`, `uint32`, `uint64`, `bool`, `enum`, `sint32`, `sint64` |
+| 64-bit           | `1`   | Fixed 8 bytes           | `fixed64`, `sfixed64`, `double`                                          |
+| Length-delimited | `2`   | Length + data           | `string`, `bytes`, embedded messages, packed repeated fields             |
+| Start group      | `3`   | Deprecated              | old group feature                                                        |
+| End group        | `4`   | Deprecated              | old group feature                                                        |
+| 32-bit           | `5`   | Fixed 4 bytes           | `fixed32`, `sfixed32`, `float`                                           |

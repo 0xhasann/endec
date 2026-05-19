@@ -2,12 +2,8 @@ package endec
 
 import (
 	"bytes"
+	"protobuffs/protobuffs/personpb"
 )
-
-type Person struct {
-	Name string
-	Id   int32
-}
 
 type Field struct {
 	FieldName   string
@@ -17,9 +13,9 @@ type Field struct {
 
 type ProtoStruct map[string][]Field
 
-func Decoder(arr []byte) Person {
+func Decoder(arr []byte) *personpb.Person {
+	person := &personpb.Person{}
 	i := 0
-	person := Person{}
 	for i < len(arr) {
 		num := arr[i]
 
@@ -64,7 +60,7 @@ func Decoder(arr []byte) Person {
 
 }
 
-func Encoder(user Person, p ProtoStruct) []byte {
+func Encoder(user *personpb.Person, p ProtoStruct) []byte {
 	fields := p["Person"]
 
 	var buf bytes.Buffer

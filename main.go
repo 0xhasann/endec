@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"protobuffs/endec"
+	"protobuffs/protobuffs/personpb"
 )
 
 func main() {
 
-	person := endec.Person{
+	person := &personpb.Person{
 		Name: "Mahboob",
 		Id:   10,
 	}

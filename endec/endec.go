@@ -2,7 +2,9 @@ package endec
 
 import (
 	"bytes"
-	"protobuffs/protobuffs/personpb"
+	"protobuffs/personpb"
+	"reflect"
+	"strings"
 )
 
 type Field struct {
@@ -29,7 +31,6 @@ func Decoder(arr []byte) *personpb.Person {
 			str := string(stringArr)
 			person.Name = str
 			i = i + 2 + length
-			break
 		case 0:
 			bit := 0
 			num := 0
@@ -48,8 +49,6 @@ func Decoder(arr []byte) *personpb.Person {
 			i = i + 2
 			person.Id = int32(num)
 
-			break
-
 		default:
 
 		}
@@ -60,23 +59,29 @@ func Decoder(arr []byte) *personpb.Person {
 
 }
 
-func Encoder(user *personpb.Person, p ProtoStruct) []byte {
-	fields := p["Person"]
+func Encoder(person any, fields []Field) []byte {
+	v := reflect.ValueOf(person).Elem()
 
 	var buf bytes.Buffer
 
 	for _, field := range fields {
-		switch field.FieldName {
+		fieldName := strings.ToUpper(field.FieldName[:1]) + field.FieldName[1:]
+		value := v.FieldByName(fieldName)
+		switch field.FieldType {
 
-		case "name":
+		case "string":
+			str := value.String()
+			nameBytes := []byte(str)
+
 			buf.WriteByte(byte(field.FieldSeqNum<<3 | 2))
-			nameBytes := []byte(user.Name)
+
 			buf.WriteByte(byte(len(nameBytes)))
 			buf.Write(nameBytes)
 
-		case "id":
-			buf.WriteByte(byte(field.FieldSeqNum<<3 | 0))
-			buf.WriteByte(byte(user.Id))
+		case "int32":
+			num := value.Int()
+			buf.WriteByte(byte(field.FieldSeqNum << 3)) // int32 wire type is 0 so ignoring it.
+			buf.WriteByte(byte(num))
 		}
 	}
 

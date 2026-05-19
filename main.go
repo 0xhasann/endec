@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"protobuffs/endec"
-	"protobuffs/protobuffs/personpb"
+	"protobuffs/personpb"
 )
 
 func main() {
@@ -13,23 +13,21 @@ func main() {
 		Id:   10,
 	}
 
-	schema := endec.ProtoStruct{
-		"Person": {
-			{
-				FieldName:   "name",
-				FieldSeqNum: 1,
-				FieldType:   "string",
-			},
-			{
-				FieldName:   "id",
-				FieldSeqNum: 2,
-				FieldType:   "int32",
-			},
+	fields := []endec.Field{
+		{
+			FieldName:   "name",
+			FieldSeqNum: 1,
+			FieldType:   "string",
+		},
+		{
+			FieldName:   "id",
+			FieldSeqNum: 2,
+			FieldType:   "int32",
 		},
 	}
 
-	arr1 := endec.Encoder(person, schema)
-	// fmt.Println(arr1)
+	arr1 := endec.Encoder(person, fields)
+
 	fmt.Printf("% x\n", arr1)
 
 	testPerson := endec.Decoder(arr1)

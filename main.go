@@ -30,7 +30,7 @@ func main() {
 
 	fmt.Printf("% x\n", arr1)
 
-	testPerson := endec.Decoder(arr1)
+	testPerson := endec.Decoder(arr1, person, fields)
 
 	fmt.Println(testPerson)
 

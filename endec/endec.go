@@ -2,7 +2,6 @@ package endec
 
 import (
 	"bytes"
-	"protobuffs/personpb"
 	"reflect"
 	"strings"
 )
@@ -15,21 +14,36 @@ type Field struct {
 
 type ProtoStruct map[string][]Field
 
-func Decoder(arr []byte) *personpb.Person {
-	person := &personpb.Person{}
+func Decoder(arr []byte, obj any, fields []Field) any {
+	v := reflect.ValueOf(obj).Elem()
 	i := 0
-	for i < len(arr) {
-		num := arr[i]
 
-		buffType := num & 0b111
-		// buffTag := num >> 3
+	for i < len(arr) {
+
+		field := arr[i]
+
+		buffType := field & 0b111
+		fieldNum := int(field >> 3)
+
+		var schemaField Field
+
+		for _, f := range fields {
+			if f.FieldSeqNum == fieldNum {
+				schemaField = f
+				break
+			}
+		}
+
+		fieldName := strings.ToUpper(schemaField.FieldName[:1]) + schemaField.FieldName[1:]
+
+		fieldValue := v.FieldByName(fieldName)
 
 		switch buffType {
 		case 2:
 			length := int(arr[i+1])
 			stringArr := arr[i+2 : i+2+length]
 			str := string(stringArr)
-			person.Name = str
+			fieldValue.SetString(str)
 			i = i + 2 + length
 		case 0:
 			bit := 0
@@ -37,17 +51,15 @@ func Decoder(arr []byte) *personpb.Person {
 			for arr[i+1]>>7 != 0 {
 				curr := int(arr[i+1]) & 0x7F
 				num = num + curr<<bit
-
 				bit += 7
 				i++
-
 			}
 
 			curr := int(arr[i+1]) & 0x7F
 			num = num + curr<<bit
 			bit += 7
 			i = i + 2
-			person.Id = int32(num)
+			fieldValue.SetInt(int64(num))
 
 		default:
 
@@ -55,7 +67,7 @@ func Decoder(arr []byte) *personpb.Person {
 
 	}
 
-	return person
+	return obj
 
 }
 
